@@ -32,10 +32,10 @@ public class DialogueManager : MonoBehaviour
         
         nameText.text = dialogue.name;
         sentences.Clear();
-
+        
+        var currentItem = GameObject.FindGameObjectWithTag("Item");
         if (nameText.text == "The Down Count")
         {
-            var currentItem = GameObject.FindGameObjectWithTag("Item");
             if (currentItem != null)
             {
                 currentItem.GetComponent<Button>().interactable = true;
