@@ -8,24 +8,37 @@ public class DialogueManager : MonoBehaviour
 {
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI dialogueText;
+    public TextMeshProUGUI timerText;
     public Animator animator;
     public GameObject takeButton;
     public GameObject leaveButton;
     public GameObject nextButton;
+    public GameObject continueButton;
+    public GameObject stayButton;
     public GameObject[] dialogueItems;
     public Canvas canvas;
     private bool coroutineRunning;
     private Queue<string> sentences;
     private string currentSentence;
-    private string itemName;
-    private int itemCost;
-    private GameObject clickedItem;
-    private GameObject lastClickedItem;
+    public string itemName;
+    public int itemCost;
+    public GameObject clickedItem;
+    public GameObject clickedRoomArrow;
+    [SerializeField] private GameObject lastClickedItem;
     [SerializeField] private GameObject[] roomArrows;
+    private bool costDialogue;
+
+    public int timeRemaining;
     
     void Start()
     {
+        timeRemaining = 100;
         sentences = new Queue<string>();
+    }
+
+    void Update()
+    {
+        timerText.text = timeRemaining.ToString();
     }
 
     public void StartDialogue(Dialogue dialogue, ItemData itemData)
@@ -35,12 +48,11 @@ public class DialogueManager : MonoBehaviour
         {
             roomArrow.SetActive(false);
         }
-        itemName = itemData.itemName;
-        itemCost = itemData.itemTimeCost;
+
         clickedItem = itemData.itemGO;
         animator.SetBool("IsOpen", true);
-        
         nameText.text = dialogue.name;
+        
         sentences.Clear();
         
         var currentItem = GameObject.FindGameObjectWithTag("SavedItem");
@@ -67,18 +79,25 @@ public class DialogueManager : MonoBehaviour
             nextButton.SetActive(true);
         }
         
-        if (sentences.Count == 2 && itemName != "" && !coroutineRunning)
+        if (sentences.Count == 2 && clickedItem != null && !coroutineRunning && nameText.text != "The Down Count")
         {
             takeButton.SetActive(true);
             leaveButton.SetActive(true);
             nextButton.SetActive(false);
         }
 
-        if (sentences.Count == 1 && itemName != "")
+        if (sentences.Count == 1 && clickedItem != null && nameText.text != "The Down Count")
         {
             takeButton.SetActive(false);
             leaveButton.SetActive(false);
             nextButton.SetActive(true);
+        }
+
+        if (sentences.Count == 1 && costDialogue)
+        {
+            continueButton.SetActive(true);
+            stayButton.SetActive(true);
+            nextButton.SetActive(false);
         }
         
         if (sentences.Count == 0 && !coroutineRunning)
@@ -109,6 +128,8 @@ public class DialogueManager : MonoBehaviour
         {
             lastClickedItem.SetActive(true);
         }
+        itemName = clickedItem.GetComponent<InteractableTrigger>().itemData.itemName;
+        itemCost = clickedItem.GetComponent<InteractableTrigger>().itemData.itemTimeCost;
         lastClickedItem = clickedItem;
         clickedItem.SetActive(false);
         var currentItem = GameObject.FindGameObjectWithTag("SavedItem");
@@ -140,7 +161,33 @@ public class DialogueManager : MonoBehaviour
         coroutineRunning = false;
     }
 
-    
+    public void TimeCostDialogue()
+    {
+        costDialogue = true;
+        foreach (GameObject roomArrow in roomArrows)
+        {
+            roomArrow.SetActive(false);
+        }
+        animator.SetBool("IsOpen", true);
+        nameText.text = "";
+        sentences.Clear();
+
+        var costSentence = "Moving with the " + itemName + " will cost " + itemCost + " minutes. Continue?";
+        sentences.Enqueue(costSentence);
+        currentSentence = sentences.Peek();
+        DisplayNextSentence();
+    }
+
+    public void GetRoomArrow()
+    {
+        var roomArrowScript = clickedRoomArrow.GetComponent<RoomChangeScript>();
+        roomArrowScript.ChangeRoom();
+    }
+
+    public void ResetItem()
+    {
+        clickedItem = null;
+    }
 
     public void EndDialogue()
     {
@@ -153,9 +200,13 @@ public class DialogueManager : MonoBehaviour
         {
             currentItem.GetComponent<Button>().interactable = false;
         }
+        clickedItem = lastClickedItem;
         animator.SetBool("IsOpen", false);
+        costDialogue = false;
         takeButton.SetActive(false);
         leaveButton.SetActive(false);
+        stayButton.SetActive(false);
+        continueButton.SetActive(false);
         nextButton.SetActive(true);
     }
 }
