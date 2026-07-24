@@ -7,4 +7,5 @@ public class ItemData
 {
     public string itemName;
     public int itemTimeCost;
+    public GameObject itemGO;
 }

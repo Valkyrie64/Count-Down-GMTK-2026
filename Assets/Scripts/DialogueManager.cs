@@ -19,6 +19,10 @@ public class DialogueManager : MonoBehaviour
     private string currentSentence;
     private string itemName;
     private int itemCost;
+    private GameObject clickedItem;
+    private GameObject lastClickedItem;
+    [SerializeField] private GameObject[] roomArrows;
+    
     void Start()
     {
         sentences = new Queue<string>();
@@ -26,14 +30,20 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(Dialogue dialogue, ItemData itemData)
     {
+
+        foreach (GameObject roomArrow in roomArrows)
+        {
+            roomArrow.SetActive(false);
+        }
         itemName = itemData.itemName;
         itemCost = itemData.itemTimeCost;
+        clickedItem = itemData.itemGO;
         animator.SetBool("IsOpen", true);
         
         nameText.text = dialogue.name;
         sentences.Clear();
         
-        var currentItem = GameObject.FindGameObjectWithTag("Item");
+        var currentItem = GameObject.FindGameObjectWithTag("SavedItem");
         if (nameText.text == "The Down Count")
         {
             if (currentItem != null)
@@ -95,15 +105,24 @@ public class DialogueManager : MonoBehaviour
 
     public void TakeItem()
     {
-        var currentItem = GameObject.FindGameObjectWithTag("Item");
+        if (lastClickedItem != null)
+        {
+            lastClickedItem.SetActive(true);
+        }
+        lastClickedItem = clickedItem;
+        clickedItem.SetActive(false);
+        var currentItem = GameObject.FindGameObjectWithTag("SavedItem");
         Destroy(currentItem);
         switch (itemName)
         {
-            case "Book":
+            case "Turtle":
                 Instantiate(dialogueItems[0], canvas.transform);
                 break;
-            case "Meal":
+            case "Cloth":
                 Instantiate(dialogueItems[1], canvas.transform);
+                break;
+            case "Photo":
+                Instantiate(dialogueItems[2], canvas.transform);
                 break;
         }
         
@@ -125,7 +144,11 @@ public class DialogueManager : MonoBehaviour
 
     public void EndDialogue()
     {
-        var currentItem = GameObject.FindGameObjectWithTag("Item");
+        foreach (GameObject roomArrow in roomArrows)
+        {
+            roomArrow.SetActive(true);
+        }
+        var currentItem = GameObject.FindGameObjectWithTag("SavedItem");
         if (currentItem != null)
         {
             currentItem.GetComponent<Button>().interactable = false;
