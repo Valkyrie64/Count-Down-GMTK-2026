@@ -1,0 +1,2 @@
+VAR itemName = ""
+VAR itemCost = ""

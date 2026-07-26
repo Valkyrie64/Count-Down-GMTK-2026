@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 1869894142688948704}
   - component: {fileID: 1143268561322189777}
   - component: {fileID: 8713340707013806}
-  - component: {fileID: 6610236439907045896}
   - component: {fileID: 8695894051278006211}
   m_Layer: 5
   m_Name: Turtle_D
@@ -122,19 +121,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1869894142688948704}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6610236439907045896}
-        m_TargetAssemblyTypeName: InteractableTrigger, Assembly-CSharp
-        m_MethodName: InterectTrigger
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8713340707013806
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,26 +167,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &6610236439907045896
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1475253921976641040}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cad1d2979a12c4f4c8e3c91bb7063200, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InteractableTrigger
-  dialogue:
-    name: The Down Count
-    sentences:
-    - Tortticelli! Vhere did you find him. I vas looking for him earlier today.
-    - At least he is safe. Maybe you can take care of him vhen I am gone.
-  itemData:
-    itemName: 
-    itemTimeCost: 0
 --- !u!114 &8695894051278006211
 MonoBehaviour:
   m_ObjectHideFlags: 0

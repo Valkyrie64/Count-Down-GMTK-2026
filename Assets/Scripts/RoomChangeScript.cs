@@ -3,35 +3,35 @@ using UnityEngine;
 public class RoomChangeScript : MonoBehaviour
 {
     public Camera mainCam;
-    public Vector2 changePosition;
-    public string roomChangeName;
-    private DialogueManager dialogueManager;
+    public Vector3 changePosition;
+    public TextAsset inkJSON;
+    private InkDialogueManager dialogueManager;
     private CursorScript cursorManager;
-    private GameObject currentItem;
+    private string currentItem;
     private int timeCost;
 
     void Awake()
     {
-        dialogueManager = FindObjectOfType<DialogueManager>();
+        dialogueManager = FindObjectOfType<InkDialogueManager>();
         cursorManager = FindObjectOfType<CursorScript>();
     }
     void Update()
     {
-        currentItem = dialogueManager.clickedItem;
-        timeCost = dialogueManager.itemCost;
+        currentItem = dialogueManager.dialogueItemName;
+        timeCost = dialogueManager.dialogueItemCost;
     }
     public void CheckCost()
     {
         cursorManager.RevertCursor();
         cursorManager.RevertText();
-        if (currentItem == null)
+        if (currentItem == "")
         {
             ChangeRoom();
         }
         else
         {
             dialogueManager.clickedRoomArrow = this.gameObject;
-            dialogueManager.TimeCostDialogue();
+            dialogueManager.EnterDialogue(inkJSON, null);
         }
     }
 
