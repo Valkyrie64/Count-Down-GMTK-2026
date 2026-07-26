@@ -9,6 +9,8 @@ public class RoomChangeScript : MonoBehaviour
     private CursorScript cursorManager;
     private string currentItem;
     private int timeCost;
+    [SerializeField] private AudioSource clickSource;
+    [SerializeField] private AudioClip clickSound;
 
     void Awake()
     {
@@ -19,6 +21,10 @@ public class RoomChangeScript : MonoBehaviour
     {
         currentItem = dialogueManager.dialogueItemName;
         timeCost = dialogueManager.dialogueItemCost;
+        if (dialogueManager.timeRemaining <= 0)
+        {
+            EndGameTrigger();
+        }
     }
     public void CheckCost()
     {
@@ -37,7 +43,13 @@ public class RoomChangeScript : MonoBehaviour
 
     public void ChangeRoom()
     {
+        clickSource.PlayOneShot(clickSound);
         dialogueManager.timeRemaining -= timeCost;
         mainCam.transform.position = changePosition;
+    }
+
+    private void EndGameTrigger()
+    {
+        mainCam.transform.position = new Vector3(0, 0, -12);
     }
 }

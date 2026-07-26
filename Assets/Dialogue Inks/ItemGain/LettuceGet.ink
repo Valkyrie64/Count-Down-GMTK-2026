@@ -7,11 +7,11 @@ EXTERNAL gainItem(itemName, itemCost)
 You tried to open the cabinet but despite all your efforts they remained closed.
 Usually it's the count who opens it. It's the only place in the kitchen he visits every day.
 He should know how to do it
-    //{
-    //- itemName == "Purple Key":
+    {
+    - itemName == "Purple Key":
     +[Open]
         -> open
-    //}
+    }
     +[Leave]
         -> leave
 

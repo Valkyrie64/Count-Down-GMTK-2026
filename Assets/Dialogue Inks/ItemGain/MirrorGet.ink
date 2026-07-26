@@ -28,8 +28,8 @@ Take the mirror?
 === take ===
 It's a large mirror that weighs a lot. You feel like it'll take you forever to move with it.
 ~ itemName = "Mirror"
-~ itemCost = "30"
-~ gainItem("Mirror", 30)
+~ itemCost = "20"
+~ gainItem("Mirror", 20)
 You take the mirror.
     -> END
 === leave ===

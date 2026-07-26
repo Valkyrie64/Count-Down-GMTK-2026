@@ -33,6 +33,11 @@ public class InkDialogueManager : MonoBehaviour
     [SerializeField] private Sprite[] countSprites;
     public float countValue;
     
+    [Header("Audio")]
+    [SerializeField] private AudioSource typeSource;
+    [SerializeField] private AudioSource clickSource;
+    [SerializeField] private AudioClip[] audioClip;
+    
     [Header("External Objects")]
     [SerializeField] private GameObject[] roomArrows;
     public GameObject clickedRoomArrow;
@@ -49,6 +54,7 @@ public class InkDialogueManager : MonoBehaviour
     private Coroutine typeSentenceCoroutine;
     private DefaultInputActions inputActions;
     private InputAction mouseClickAction;
+    private GameObject currentItem;
 
 
     void Awake()
@@ -58,7 +64,7 @@ public class InkDialogueManager : MonoBehaviour
         mouseClickAction.Enable();
         dialogueVariables = new DialogueVariables(globalsInkFile.filePath);
         timeRemaining = 100;
-        countValue = 0.1f;
+        countValue = 20f;
     }
 
     void OnEnable()
@@ -84,20 +90,34 @@ public class InkDialogueManager : MonoBehaviour
     {
         timer.text = timeRemaining.ToString();
         countSlider.value = countValue;
+        if (countValue > 100)
+        {
+            countValue = 100;
+        }
+
+        if (countValue < 0)
+        {
+            countValue = 0;
+        }
         switch (countValue)
         {
-            case < 0.25f:
+            case < 25f:
                 countRenderer.sprite = countSprites[0];
                 break;
-            case < 0.50f:
+            case < 50f:
                 countRenderer.sprite = countSprites[1];
                 break;
-            case < 0.75f:
+            case < 75f:
                 countRenderer.sprite = countSprites[2];
                 break;
-            case <= 1f:
+            case <= 100f:
                 countRenderer.sprite = countSprites[3];
                 break;
+        }
+
+        if (timeRemaining <= 0)
+        {
+            StartEndGame();
         }
     }
 
@@ -111,6 +131,7 @@ public class InkDialogueManager : MonoBehaviour
 
         if (clickedRoomArrow != null)
         {
+            
             roomChangeScript = clickedRoomArrow.GetComponent<RoomChangeScript>();
         }
         
@@ -118,7 +139,10 @@ public class InkDialogueManager : MonoBehaviour
         
         currentStory.BindExternalFunction("gainItem", (string itemName, int itemCost) => {dialogueItemName = itemName; dialogueItemCost = itemCost;
             SetItems(); });
-        currentStory.BindExternalFunction("roomChange", () => {roomChangeScript.ChangeRoom(); });
+        currentStory.BindExternalFunction("roomChange", () => {roomChangeScript.ChangeRoom();});
+        currentStory.BindExternalFunction("countValueChange", (float dialogueCountValue) => {countValue += dialogueCountValue; currentItem = GameObject.FindGameObjectWithTag("SavedItem");
+            Destroy(currentItem); Destroy(lastClickedItem); dialogueItemName = ""; dialogueItemCost = 0;});
+        currentStory.BindExternalFunction("moodCheck", (bool win) => { GameWon(win);});
 
         foreach (GameObject roomArrow in roomArrows)
         {
@@ -130,6 +154,8 @@ public class InkDialogueManager : MonoBehaviour
 
     public void ContinueStory()
     {
+        clickSource.clip = audioClip[1];
+        clickSource.Play();
         if (currentStory.canContinue)
         {
             if (typeSentenceCoroutine != null)
@@ -154,6 +180,7 @@ public class InkDialogueManager : MonoBehaviour
         
         currentStory.UnbindExternalFunction("gainItem");
         currentStory.UnbindExternalFunction("roomChange");
+        currentStory.UnbindExternalFunction("countValueChange");
         
         foreach (GameObject roomArrow in roomArrows)
         {
@@ -169,7 +196,7 @@ public class InkDialogueManager : MonoBehaviour
         }
         lastClickedItem = clickedItem;
         clickedItem.SetActive(false);
-        var currentItem = GameObject.FindGameObjectWithTag("SavedItem");
+        currentItem = GameObject.FindGameObjectWithTag("SavedItem");
         Destroy(currentItem);
         switch (dialogueItemName)
         {
@@ -255,6 +282,7 @@ public class InkDialogueManager : MonoBehaviour
     IEnumerator TypeSentence(string sentence)
     {
         dialogueText.text = "";
+        typeSource.clip = audioClip[0];
         HideChoices();
         continueButton.gameObject.SetActive(false);
         foreach (char letter in sentence.ToCharArray())
@@ -266,9 +294,28 @@ public class InkDialogueManager : MonoBehaviour
             }
             
             dialogueText.text += letter;
+            typeSource.Play();
             yield return new WaitForSeconds(0.04f);
         }
         continueButton.gameObject.SetActive(true);
         DisplayChoices();
+    }
+
+    private void StartEndGame()
+    {
+        var endGameDialogue = gameObject.GetComponent<InkDialogueTrigger>();
+        endGameDialogue.ItemInteract();
+    }
+
+    private void GameWon(bool win)
+    {
+        if (win)
+        {
+            Application.Quit();
+        }
+        else
+        {
+            Application.Quit();
+        }
     }
 }

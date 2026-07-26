@@ -18,7 +18,7 @@ You leave the meat.
 
 === take ===
 ~ itemName = "Meat"
-~ itemCost = "5"
-~ gainItem("Meat", 5)
+~ itemCost = "10"
+~ gainItem("Meat", 10)
 You take the meat.
 -> END

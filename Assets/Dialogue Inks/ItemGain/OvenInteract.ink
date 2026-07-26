@@ -41,7 +41,7 @@ No you don’t.
 
 === take ===
 ~ itemName = "Cooked Meat"
-~ itemCost = "5"
-~ gainItem("CMeat", 5)
+~ itemCost = "10"
+~ gainItem("CMeat", 10)
 You cook the meat.
 -> END

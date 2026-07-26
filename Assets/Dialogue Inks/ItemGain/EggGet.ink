@@ -32,7 +32,7 @@ You abandon your machiavellian plan and keep the purple turtle close to you.
 
 === take ===
 ~ itemName = "Phoenix Egg"
-~ itemCost = "5"
-~ gainItem("Egg", 5)
+~ itemCost = "15"
+~ gainItem("Egg", 15)
 You take the phoenix egg.
 -> END

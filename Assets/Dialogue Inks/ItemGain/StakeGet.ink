@@ -33,7 +33,7 @@ You leave the stakes alone.
 
 === take ===
 ~ itemName = "Stake"
-~ itemCost = "5"
-~ gainItem("Stake", 5)
+~ itemCost = "10"
+~ gainItem("Stake", 10)
 You take a stake.
 -> END
