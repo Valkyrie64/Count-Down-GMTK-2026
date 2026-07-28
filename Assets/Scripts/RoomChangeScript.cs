@@ -21,8 +21,9 @@ public class RoomChangeScript : MonoBehaviour
     {
         currentItem = dialogueManager.dialogueItemName;
         timeCost = dialogueManager.dialogueItemCost;
-        if (dialogueManager.timeRemaining <= 0)
+        if (dialogueManager.timeRemaining <= 0 && dialogueManager.endgameStarted == false)
         {
+            dialogueManager.endgameStarted = true;
             EndGameTrigger();
         }
     }
@@ -51,5 +52,6 @@ public class RoomChangeScript : MonoBehaviour
     private void EndGameTrigger()
     {
         mainCam.transform.position = new Vector3(0, 0, -12);
+        dialogueManager.StartEndGame();
     }
 }

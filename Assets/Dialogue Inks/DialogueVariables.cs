@@ -7,18 +7,28 @@ public class DialogueVariables
 {
    private Dictionary<string, Ink.Runtime.Object> variables;
 
-   public DialogueVariables(string globalsFilePath)
+   public DialogueVariables(TextAsset loadGlobalsJSON)
    {
-      string inkFileContents = File.ReadAllText(globalsFilePath);
-      Ink.Compiler compiler = new Ink.Compiler(inkFileContents);
-      Story globalVariablesStory = compiler.Compile();
+
+      Story globalVariablesStory = new Story(loadGlobalsJSON.text);
       
       variables = new Dictionary<string, Ink.Runtime.Object>();
       foreach (string name in globalVariablesStory.variablesState)
       {
          Ink.Runtime.Object value = globalVariablesStory.variablesState.GetVariableWithName(name);
          variables.Add(name, value);
+         Debug.Log("Initialized global dialogue variable: " + name + " = " + value);
       }
+      /*string inkFileContents = File.ReadAllText(globalsFilePath);
+      Ink.Compiler compiler = new Ink.Compiler(inkFileContents);
+      Story globalVariablesStory = compiler.Compile();
+
+      variables = new Dictionary<string, Ink.Runtime.Object>();
+      foreach (string name in globalVariablesStory.variablesState)
+      {
+         Ink.Runtime.Object value = globalVariablesStory.variablesState.GetVariableWithName(name);
+         variables.Add(name, value);
+      }*/
    }
    public void StartListening(Story story)
    {

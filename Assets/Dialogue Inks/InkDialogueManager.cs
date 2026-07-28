@@ -4,9 +4,10 @@ using UnityEngine.UI;
 using Ink.Runtime;
 using System.Collections;
 using System.Collections.Generic;
-using Ink.UnityIntegration;
+//using Ink.UnityIntegration;
 using NUnit.Framework;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class InkDialogueManager : MonoBehaviour
 {
@@ -32,7 +33,11 @@ public class InkDialogueManager : MonoBehaviour
     [SerializeField] private Image countRenderer;
     [SerializeField] private Sprite[] countSprites;
     public float countValue;
-    
+
+    [Header("Count Animations")]
+    [SerializeField] private Animator countAnimator;
+    private float animTimer;
+
     [Header("Audio")]
     [SerializeField] private AudioSource typeSource;
     [SerializeField] private AudioSource clickSource;
@@ -42,11 +47,12 @@ public class InkDialogueManager : MonoBehaviour
     [SerializeField] private GameObject[] roomArrows;
     public GameObject clickedRoomArrow;
     private RoomChangeScript roomChangeScript;
-    [SerializeField] private InkFile globalsInkFile;
+    [SerializeField] private TextAsset loadGlobalsJSON;
     private DialogueVariables dialogueVariables;
     public int timeRemaining;
     [SerializeField] private TextMeshProUGUI timer;
     [SerializeField] private Canvas playerCanvas;
+    public bool endgameStarted;
 
     private Story currentStory;
 
@@ -55,15 +61,17 @@ public class InkDialogueManager : MonoBehaviour
     private DefaultInputActions inputActions;
     private InputAction mouseClickAction;
     private GameObject currentItem;
+    [SerializeField] private TextAsset initialDialogue;
 
 
     void Awake()
     {
+        endgameStarted = false;
         inputActions = new DefaultInputActions();
         mouseClickAction = inputActions.UI.Click;
         mouseClickAction.Enable();
-        dialogueVariables = new DialogueVariables(globalsInkFile.filePath);
-        timeRemaining = 100;
+        dialogueVariables = new DialogueVariables(loadGlobalsJSON);
+        timeRemaining = 150;
         countValue = 20f;
     }
 
@@ -84,6 +92,8 @@ public class InkDialogueManager : MonoBehaviour
             choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
             index++;
         }
+        
+        EnterDialogue(initialDialogue, null);
     }
 
     void Update()
@@ -115,9 +125,23 @@ public class InkDialogueManager : MonoBehaviour
                 break;
         }
 
-        if (timeRemaining <= 0)
+        /*if (timeRemaining <= 0)
         {
             StartEndGame();
+        }*/
+    }
+
+    void FixedUpdate()
+    {
+        animTimer += Time.deltaTime;
+    }
+
+    void LateUpdate()
+    {
+        if (animTimer > 0.5f)
+        {
+            countAnimator.SetBool("Happy", false);
+            countAnimator.SetBool("Sad", false);
         }
     }
 
@@ -140,7 +164,7 @@ public class InkDialogueManager : MonoBehaviour
         currentStory.BindExternalFunction("gainItem", (string itemName, int itemCost) => {dialogueItemName = itemName; dialogueItemCost = itemCost;
             SetItems(); });
         currentStory.BindExternalFunction("roomChange", () => {roomChangeScript.ChangeRoom();});
-        currentStory.BindExternalFunction("countValueChange", (float dialogueCountValue) => {countValue += dialogueCountValue; currentItem = GameObject.FindGameObjectWithTag("SavedItem");
+        currentStory.BindExternalFunction("countValueChange", (float dialogueCountValue) => {UpdateCountValue(dialogueCountValue); currentItem = GameObject.FindGameObjectWithTag("SavedItem");
             Destroy(currentItem); Destroy(lastClickedItem); dialogueItemName = ""; dialogueItemCost = 0;});
         currentStory.BindExternalFunction("moodCheck", (bool win) => { GameWon(win);});
 
@@ -186,6 +210,16 @@ public class InkDialogueManager : MonoBehaviour
         {
             roomArrow.SetActive(true);
         }
+
+        if (countAnimator.GetBool("Win"))
+        {
+            SceneManager.LoadScene(sceneBuildIndex: 2);
+        }
+
+        if (countAnimator.GetBool("Lose"))
+        {
+            SceneManager.LoadScene(sceneBuildIndex: 3);
+        }
     }
 
     private void SetItems()
@@ -200,38 +234,62 @@ public class InkDialogueManager : MonoBehaviour
         Destroy(currentItem);
         switch (dialogueItemName)
         {
-            case "CMeat":
+            case "BioBook":
                 Instantiate(dialoguePrefabs[0], playerCanvas.transform);
                 break;
-            case "Cushion":
+            case "CMeat":
                 Instantiate(dialoguePrefabs[1], playerCanvas.transform);
                 break;
-            case "Egg":
+            case "Code":
                 Instantiate(dialoguePrefabs[2], playerCanvas.transform);
                 break;
-            case "Letter":
+            case "Cushion":
                 Instantiate(dialoguePrefabs[3], playerCanvas.transform);
                 break;
-            case "Lettuce":
+            case "Egg":
                 Instantiate(dialoguePrefabs[4], playerCanvas.transform);
                 break;
-            case "Meat":
+            case "FanFiction":
                 Instantiate(dialoguePrefabs[5], playerCanvas.transform);
                 break;
-            case "Mirror":
+            case "HFBottle":
                 Instantiate(dialoguePrefabs[6], playerCanvas.transform);
                 break;
-            case "Pasta":
+            case "Letter":
                 Instantiate(dialoguePrefabs[7], playerCanvas.transform);
                 break;
-            case "Stake":
+            case "Lettuce":
                 Instantiate(dialoguePrefabs[8], playerCanvas.transform);
                 break;
-            case "Poster":
+            case "Meat":
                 Instantiate(dialoguePrefabs[9], playerCanvas.transform);
                 break;
-            case "Turtle":
+            case "Mirror":
                 Instantiate(dialoguePrefabs[10], playerCanvas.transform);
+                break;
+            case "Pasta":
+                Instantiate(dialoguePrefabs[11], playerCanvas.transform);
+                break;
+            case "PhilBook":
+                Instantiate(dialoguePrefabs[12], playerCanvas.transform);
+                break;
+            case "Phone":
+                Instantiate(dialoguePrefabs[13], playerCanvas.transform);
+                break;
+            case "Poster":
+                Instantiate(dialoguePrefabs[14], playerCanvas.transform);
+                break;
+            case "Key":
+                Instantiate(dialoguePrefabs[15], playerCanvas.transform);
+                break;
+            case "Stake":
+                Instantiate(dialoguePrefabs[16], playerCanvas.transform);
+                break;
+            case "Turtle":
+                Instantiate(dialoguePrefabs[17], playerCanvas.transform);
+                break;
+            case "Wine":
+                Instantiate(dialoguePrefabs[18], playerCanvas.transform);
                 break;
         }
     }
@@ -278,6 +336,27 @@ public class InkDialogueManager : MonoBehaviour
         continueButton.gameObject.SetActive(true);
         ContinueStory();
     }
+
+    private void UpdateCountValue(float value)
+    {
+        var previousCountValue = countValue;
+        countValue += value;
+        if (previousCountValue < countValue)
+        {
+            //Happy Animation
+            animTimer = 0;
+            countAnimator.SetBool("Happy", true);
+            Debug.Log("Happy!!");
+        }
+
+        if (previousCountValue > countValue)
+        {
+            //Sad Animation
+            animTimer = 0;
+            countAnimator.SetBool("Sad", true);
+            Debug.Log("Sad!!");
+        }
+    }
     
     IEnumerator TypeSentence(string sentence)
     {
@@ -300,8 +379,9 @@ public class InkDialogueManager : MonoBehaviour
         continueButton.gameObject.SetActive(true);
         DisplayChoices();
     }
+    
 
-    private void StartEndGame()
+    public void StartEndGame()
     {
         var endGameDialogue = gameObject.GetComponent<InkDialogueTrigger>();
         endGameDialogue.ItemInteract();
@@ -311,11 +391,11 @@ public class InkDialogueManager : MonoBehaviour
     {
         if (win)
         {
-            Application.Quit();
+            countAnimator.SetBool("Win", true);
         }
         else
         {
-            Application.Quit();
+            countAnimator.SetBool("Lose", true);
         }
     }
 }
